@@ -18,10 +18,10 @@ class When_we_load_a_persisted_issue:
         bus.handle(cmd)
 
     def because_we_load_the_issues(self):
-        self.issue = views.view_issue(config.db.get_session, self.issue_id)
+        self.issue = views.view_issue(config.db.start_unit_of_work, self.issue_id)
 
     def it_should_have_the_correct_id(self):
-        expect(self.issue['issue_id']).to(equal(self.issue_id))
+        expect(self.issue['issue_id']).to(equal(str(self.issue_id)))
 
     def it_should_have_the_correct_description(self):
         expect(self.issue['description']).to(equal('forgot my password again'))

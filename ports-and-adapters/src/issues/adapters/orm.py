@@ -34,6 +34,9 @@ class IssueRepository(IssueLog):
             filter_by(id=issue_id).\
             first()
 
+    def list(self):
+        return self._session.query(Issue).all()
+
 
 class SqlAlchemyUnitOfWork(UnitOfWork):
 

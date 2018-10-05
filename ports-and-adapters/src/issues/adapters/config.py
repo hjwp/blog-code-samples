@@ -35,5 +35,5 @@ bus.register(msg.AssignIssue,
 
 bus.register(msg.IssueAssignedToEngineer,
              make_pipeline(services.on_issue_assigned_to_engineer,
-                           partial(views.view_issue, db.get_session),
+                           partial(views.view_issue, db.start_unit_of_work),
                            emails.EmailSender(send_to_stdout)))
