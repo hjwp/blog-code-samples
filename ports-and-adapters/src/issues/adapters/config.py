@@ -2,7 +2,7 @@ from functools import partial
 import inspect
 import logging
 
-from . import orm
+from . import slashtmp
 
 from .emails import send_to_stdout
 
@@ -12,8 +12,9 @@ from issues import services, domain, adapters
 from issues.adapters import views
 
 bus = ports.MessageBus()
-db = orm.SqlAlchemy('sqlite://', bus)
-db.recreate_schema()
+db = slashtmp
+db.set_bus(bus)
+
 
 
 def make_pipeline(handler, *args):
