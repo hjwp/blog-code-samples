@@ -17,20 +17,23 @@ Q = Queue()
 
 def _server_is_listening():
     try:
-        requests.get('http://localhost:5000')
+        requests.get('http://localhost:8000')
         return True
     except requests.exceptions.ConnectionError:
         return False
+    except Exception as e:
+        print(e)
+        raise
 
 
 
 class GivenAnAPIServer:
 
     def given_an_api_server(self):
-        assert not _server_is_listening()
+        assert _server_is_listening() is False
         cwd = Path(__file__).parent / '../..'
         self.server = subprocess.Popen([
-            sys.executable, '-m', 'issues.adapters.flask'
+            sys.executable, 'issues/manage.py', 'runserver', '--nothreading', '--noreload',
         ], cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self._wait_for_server_to_start()
         t = Thread(target=enqueue_output, args=(self.server.stdout, Q))
@@ -62,6 +65,7 @@ class GivenAnAPIServer:
 
     def cleanup_server(self):
         self.server.kill()
+        self.server.wait()
 
 
 def report_issue(reporter_name='fred',
@@ -73,8 +77,9 @@ def report_issue(reporter_name='fred',
         'problem_description': problem_description
     }
 
-    resp = requests.post('http://localhost:5000/issues', json=data)
-    return resp.headers['Location']
+    resp = requests.post('http://localhost:8000/issues', json=data, allow_redirects=False)
+    print('response', resp, resp.text)
+    return 'http://localhost:8000' + resp.headers['Location']
 
 
 class When_reporting_a_new_issue(GivenAnAPIServer):
